@@ -527,7 +527,14 @@ if (process.platform === 'linux') {
   // Force Ganesh (the painter's import path), not the Chromium-148 Graphite default.
   app.commandLine.appendSwitch('disable-skia-graphite');
 }
-// macOS: IOSurface/Metal zero-copy path — flags TBD by macbook-release.
+else if (process.platform === "darwin") {
+  // macOS zero-copy is the Metal/IOSurface path: the painter check_ins the
+  // producer's IOSurface via the de.aardvark.iosurface mach bootstrap port and
+  // composites it (no Vulkan/Ganesh — that is Linux only). The only requirement
+  // is that the renderer can reach that mach port, which the app sandbox blocks;
+  // running unsandboxed (we already use sandbox:false) plus --no-sandbox grants it.
+  app.commandLine.appendSwitch("no-sandbox");
+}
 // win32: DXGI keyed-mutex shared-handle path works with the default ANGLE/D3D11
 //        backend (proven on the Testing/Release builds); no extra GPU flags
 //        were needed there. Add here if a packaged win32 run shows otherwise.

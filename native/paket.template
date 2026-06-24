@@ -1,0 +1,11 @@
+type file
+id Aardium.Shared-Darwin-arm64
+version 1.0.0
+authors Aardvark Platform Team
+owners Aardvark Platform Team
+projectUrl https://github.com/aardvark-community/aardium.shared
+licenseUrl http://www.apache.org/licenses/LICENSE-2.0.txt
+description
+    Patched zero-copy Electron 42.4.1 native browser for Aardium.Shared (macOS arm64). Baked-in R2 preload + IOSurface/Metal zero-copy; signed + notarized .app.
+files
+    dist/Aardium.Shared-Darwin-arm64.tar.gz ==> tools

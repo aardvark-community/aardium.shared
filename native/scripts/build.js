@@ -52,6 +52,7 @@ async function main() {
         /^\/package-lock\.json$/,
         /^\/electron-zip($|\/)/
       ],
+      appBundleId: 'com.aardvarkians.aardium.shared',
       icon: path.join(rootDir, 'aardvark'),
       appCopyright: `Copyright (C) ${year} Aardvark Platform Team. All Rights Reserved.`,
       win32metadata: {
