@@ -24,7 +24,15 @@ nupkg to `<cache>/Aardium.Shared/{arch}/{version}/`, then on Linux/macOS untars
 1. **Zip the patched Electron** as `electron-v42.4.1-{platform}-{arch}.zip` (the standard Electron
    dist layout — binary + `resources/` + `*.pak` + `locales/` + ...). Put it in a directory and
    `export AARDIUM_ELECTRON_ZIP_DIR=<dir>`.
-2. `cd native && npm install` — rebuilds `node-shared-mem` against Electron 42.4.1 (`electron-rebuild`).
+2. `cd native && npm run setup` — installs deps and rebuilds `node-shared-mem` against Electron 42.4.1.
+   Use `npm run setup`, **not** a bare `npm install`: `node-shared-mem@2.1.0` uses C++20 `std::string::starts_with`
+   but declares no C++ standard in its `binding.gyp`, so node-gyp's default (gnu++17 on gcc/clang, older on MSVC)
+   fails to compile — and because the module has `gypfile:true`, npm auto-builds it during install *before* any
+   fix can run, then rolls back the whole `node_modules`. `npm run setup` does
+   `npm install --ignore-scripts` → `patch-package` (applies `patches/node-shared-mem+2.1.0.patch`, which adds
+   `-std=c++20` for gcc/clang, `CLANG_CXX_LANGUAGE_STANDARD=c++20` for macOS, `/std:c++20` for MSVC) →
+   `electron-rebuild node-shared-mem`. Works cold on all three platforms with no manual env. (`npm install` re-runs
+   the same via `postinstall` once deps exist, but only `npm run setup` survives a clean checkout.)
 3. `npm run build:{win32|linux|darwin}:{x64|arm64}` → bundles this app (`main.js` + the baked-in R2
    preload in `src/preload.js`) onto the patched Electron via `@electron/packager`, renames the
    product to `Aardium.Shared`, and produces `native/dist/Aardium.Shared-{Platform}-{arch}.tar.gz`
