@@ -506,6 +506,26 @@ parseOptions(process.argv);
 if (!config.menu) electron.Menu.setApplicationMenu(null)
 if (!config.detectProxy) app.commandLine.appendSwitch('no-proxy-server');
 
+// Zero-copy GPU texture sharing needs the GPU process on the right graphics
+// backend with access to the host's render node. Aardium.Shared IS the zero-copy
+// browser and already runs the renderer unsandboxed (sandbox:false +
+// webSecurity:false above), so these are always-on per platform. The option
+// parser rejects raw Electron switches on the CLI, so they're set here.
+if (process.platform === 'linux') {
+  // The aardvark painter imports the producer's dma-buf as a Vulkan VkImage in
+  // the GPU process; bring it up on native Vulkan with /dev/dri access.
+  // disable-gpu-sandbox (narrower than --no-sandbox) also covers the dist's
+  // non-setuid chrome-sandbox. Proven: REG + continuous composite swaps.
+  app.commandLine.appendSwitch('enable-features', 'Vulkan');
+  app.commandLine.appendSwitch('use-vulkan', 'native');
+  app.commandLine.appendSwitch('disable-gpu-sandbox');
+  app.commandLine.appendSwitch('ignore-gpu-blocklist');
+}
+// macOS: IOSurface/Metal zero-copy path — flags TBD by macbook-release.
+// win32: DXGI keyed-mutex shared-handle path works with the default ANGLE/D3D11
+//        backend (proven on the Testing/Release builds); no extra GPU flags
+//        were needed there. Add here if a packaged win32 run shows otherwise.
+
 // Make sure Aardium exits when the parent process crashes or terminates.
 if (config.parentPid) {
     const monitorInterval = setInterval(() => {

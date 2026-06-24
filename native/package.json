@@ -9,7 +9,9 @@
     "url": "http://aardvarkians.com"
   },
   "scripts": {
-    "postinstall": "electron-rebuild node-shared-mem",
+    "setup": "npm ci --ignore-scripts || npm install --ignore-scripts; npm run rebuild",
+    "rebuild": "patch-package && electron-rebuild node-shared-mem",
+    "postinstall": "patch-package && electron-rebuild node-shared-mem",
     "build": "node scripts/build.js",
     "build:win32:x64": "npm run build -- --platform=win32 --arch=x64",
     "build:linux:x64": "npm run build -- --platform=linux --arch=x64 && cd dist/Aardium.Shared-linux-x64 && tar -zcvf ../Aardium.Shared-Linux-x64.tar.gz .",
@@ -25,11 +27,12 @@
     "ws": "^8.20.1"
   },
   "devDependencies": {
+    "@electron/notarize": "^3.1.1",
+    "@electron/packager": "^20.0.0",
     "@electron/rebuild": "^4.0.4",
     "dotenv": "^17.4.2",
     "electron": "42.4.1",
-    "@electron/notarize": "^3.1.1",
-    "@electron/packager": "^20.0.0"
+    "patch-package": "^8.0.1"
   },
   "build": {
     "appId": "com.aardvarkians.aardium.shared",

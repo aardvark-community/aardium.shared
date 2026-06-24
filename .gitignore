@@ -17,6 +17,11 @@ bin/*
 !bin/*.template
 /node_modules/.yarn-integrity
 **/.idea
-*.DotSettings.usernative/node_modules
+*.DotSettings.user
+native/node_modules
 native/dist
+native/nuget/*.nupkg
+native/package-lock.json
 native/Aardium.Shared-*.tar.gz
+# Patched-Electron dist zip staging (large; built per-platform, not source)
+electron-zip/

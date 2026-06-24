@@ -1,0 +1,31 @@
+diff --git a/node_modules/node-shared-mem/binding.gyp b/node_modules/node-shared-mem/binding.gyp
+index 642edff..58d5b0a 100644
+--- a/node_modules/node-shared-mem/binding.gyp
++++ b/node_modules/node-shared-mem/binding.gyp
+@@ -3,6 +3,7 @@
+     "target_name": "node_shared_mem",
+     "cflags!": [ "-fno-exceptions" ],
+     "cflags_cc!": [ "-fno-exceptions" ],
++    "cflags_cc": [ "-std=c++20" ],
+     "sources": [
+       "node-shared-mem.cc",
+ 	    "addon.cc"
+@@ -17,6 +18,18 @@
+                 "-lrt"
+                 ]
+           },
++        }],
++        ["OS=='mac'", {
++          "xcode_settings": {
++            "CLANG_CXX_LANGUAGE_STANDARD": "c++20"
++          }
++        }],
++        ["OS=='win'", {
++          "msvs_settings": {
++            "VCCLCompilerTool": {
++              "AdditionalOptions": [ "/std:c++20" ]
++            }
++          }
+         }]
+     ],
+     'defines': [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ],
