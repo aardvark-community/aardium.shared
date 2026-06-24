@@ -38,6 +38,20 @@ async function main() {
       platform,
       arch,
       overwrite: true,
+      // `dir` is native/ and `out` is native/dist, so without an ignore the
+      // packager bundles dist/ (the previous build!), nuget/, patches/, the
+      // electron-zip, and other non-runtime cruft into app.asar — ballooning it
+      // every rebuild (2MB → 100s of MB). Keep only the app runtime.
+      ignore: [
+        /^\/dist($|\/)/,
+        /^\/nuget($|\/)/,
+        /^\/patches($|\/)/,
+        /^\/scripts($|\/)/,
+        /^\/build($|\/)/,
+        /^\/\.git($|\/)/,
+        /^\/package-lock\.json$/,
+        /^\/electron-zip($|\/)/
+      ],
       icon: path.join(rootDir, 'aardvark'),
       appCopyright: `Copyright (C) ${year} Aardvark Platform Team. All Rights Reserved.`,
       win32metadata: {
