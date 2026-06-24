@@ -9,7 +9,7 @@
     "url": "http://aardvarkians.com"
   },
   "scripts": {
-    "setup": "npm ci --ignore-scripts || npm install --ignore-scripts; npm run rebuild",
+    "setup": "npm ci --ignore-scripts || npm install --ignore-scripts && npm run rebuild",
     "rebuild": "patch-package && electron-rebuild node-shared-mem",
     "postinstall": "patch-package && electron-rebuild node-shared-mem",
     "build": "node scripts/build.js",

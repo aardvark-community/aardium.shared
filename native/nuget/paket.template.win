@@ -1,0 +1,11 @@
+type file
+id Aardium.Shared-Win32-x64
+version 1.0.0
+authors Aardvark Platform Team
+owners Aardvark Platform Team
+projectUrl https://github.com/aardvark-community/aardium.shared
+licenseUrl http://www.apache.org/licenses/LICENSE-2.0.txt
+description
+    Native patched-Electron browser (Windows x64) for Aardium.Shared - true zero-copy GPU texture sharing. Consumed by the Aardium.Shared lib, which loads tools/Aardium.Shared.exe on first use.
+files
+    ../dist/Aardium.Shared-win32-x64 ==> tools
