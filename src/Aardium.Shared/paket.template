@@ -1,0 +1,9 @@
+type project
+id Aardium.Shared
+authors Aardvark Platform Team
+owners Aardvark Platform Team
+projectUrl https://github.com/aardvark-community/aardium.shared
+licenseUrl http://www.apache.org/licenses/LICENSE-2.0.txt
+description
+    Aardium.Shared is a lightweight Electron browser with true zero-copy GPU texture sharing (a patched Electron). It mirrors the Aardium API and downloads the native browser on first use.
+include-pdbs true

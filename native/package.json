@@ -1,0 +1,46 @@
+{
+  "name": "Aardium.Shared",
+  "productName": "Aardium.Shared",
+  "version": "1.0.0",
+  "description": "A minimal Electron app for Aardvark with true zero-copy GPU texture sharing",
+  "license": "MIT",
+  "author": {
+    "name": "The Aardvark Platform Team",
+    "url": "http://aardvarkians.com"
+  },
+  "scripts": {
+    "postinstall": "electron-rebuild node-shared-mem",
+    "build": "node scripts/build.js",
+    "build:win32:x64": "npm run build -- --platform=win32 --arch=x64",
+    "build:linux:x64": "npm run build -- --platform=linux --arch=x64 && cd dist/Aardium.Shared-linux-x64 && tar -zcvf ../Aardium.Shared-Linux-x64.tar.gz .",
+    "build:darwin:arm64": "npm run build -- --platform=darwin --arch=arm64 && cd dist/Aardium.Shared-darwin-arm64 && tar -zcvf ../Aardium.Shared-Darwin-arm64.tar.gz ."
+  },
+  "main": "main.js",
+  "repository": "https://github.com/aardvark-community/aardium.shared",
+  "dependencies": {
+    "@electron/remote": "^2.1.0",
+    "electron-localshortcut": "^3.2.1",
+    "node-getopt": "^0.3.2",
+    "node-shared-mem": "^2.1.0",
+    "ws": "^8.20.1"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.4",
+    "dotenv": "^17.4.2",
+    "electron": "42.4.1",
+    "@electron/notarize": "^3.1.1",
+    "@electron/packager": "^20.0.0"
+  },
+  "build": {
+    "appId": "com.aardvarkians.aardium.shared",
+    "mac": {
+      "category": "your.app.category.type",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "gatekeeperAssess": false
+    },
+    "buildDependenciesFromSource": true,
+    "afterSign": "scripts/notarize.js"
+  }
+}
