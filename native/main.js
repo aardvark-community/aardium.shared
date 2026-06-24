@@ -512,14 +512,20 @@ if (!config.detectProxy) app.commandLine.appendSwitch('no-proxy-server');
 // webSecurity:false above), so these are always-on per platform. The option
 // parser rejects raw Electron switches on the CLI, so they're set here.
 if (process.platform === 'linux') {
-  // The aardvark painter imports the producer's dma-buf as a Vulkan VkImage in
-  // the GPU process; bring it up on native Vulkan with /dev/dri access.
-  // disable-gpu-sandbox (narrower than --no-sandbox) also covers the dist's
-  // non-setuid chrome-sandbox. Proven: REG + continuous composite swaps.
+  // The aardvark painter imports the producer's dma-buf/OPAQUE_FD as a Vulkan
+  // VkImage in the GPU process, on the GANESH-Vulkan backend (gr_context_type=1).
+  // Chromium 148 defaults to Graphite/Dawn (gr_context_type=2) where the import
+  // path is not wired, so force native Vulkan + Ganesh and give the GPU process
+  // /dev/dri access. disable-gpu-sandbox (narrower than --no-sandbox) also covers
+  // the dist's non-setuid chrome-sandbox.
   app.commandLine.appendSwitch('enable-features', 'Vulkan');
   app.commandLine.appendSwitch('use-vulkan', 'native');
   app.commandLine.appendSwitch('disable-gpu-sandbox');
   app.commandLine.appendSwitch('ignore-gpu-blocklist');
+  // Keep the imported SharedImage off the CPU-wrapping CompoundImageBacking.
+  app.commandLine.appendSwitch('disable-features', 'UseCompoundImageBackingAsDefault');
+  // Force Ganesh (the painter's import path), not the Chromium-148 Graphite default.
+  app.commandLine.appendSwitch('disable-skia-graphite');
 }
 // macOS: IOSurface/Metal zero-copy path — flags TBD by macbook-release.
 // win32: DXGI keyed-mutex shared-handle path works with the default ANGLE/D3D11
