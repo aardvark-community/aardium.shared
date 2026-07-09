@@ -29,6 +29,7 @@ const availableOptions =
   [''  , 'detect-proxy'           , 'detect system proxy settings (may incur start-up delay)' ],
   [''  , 'frameless'              , 'frameless window'],
   [''  , 'woptions=ARG'           , 'BrowserWindow options'],
+  [''  , 'gpu-id=ARG'             , 'select the GPU/adapter for the GPU process (Chromium --use-adapter-luid)'],
   [''  , 'server=port'            , 'run server for offscreen rendering' ],
   [''  , 'open-external-urls'     , 'open external URLs in Aardium rather than the default browser'],
   [''  , 'parent-pid=ARG'         , 'id of the parent process, Aardium will automatically terminate if the parent process stops running or crashes']
@@ -66,6 +67,7 @@ function parseOptions(argv) {
   const opt = getopt.create(availableOptions).bindHelp().parse(args).options;
 
   if (opt['parent-pid']) config.parentPid = parseInt(opt['parent-pid']);
+  if (opt['gpu-id']) config.gpuId = opt['gpu-id'];
 
   if (opt.server) {
     config.server = opt.server;
@@ -505,6 +507,11 @@ function ready() {
 parseOptions(process.argv);
 if (!config.menu) electron.Menu.setApplicationMenu(null)
 if (!config.detectProxy) app.commandLine.appendSwitch('no-proxy-server');
+
+// Pin the GPU process to a specific adapter so zero-copy texture sharing stays on
+// the same physical GPU as the render (Vulkan) device. Vanilla Chromium selector;
+// on Windows/ANGLE-D3D this is the DXGI adapter LUID, a no-op where irrelevant.
+if (config.gpuId) app.commandLine.appendSwitch('use-adapter-luid', config.gpuId);
 
 // Zero-copy GPU texture sharing needs the GPU process on the right graphics
 // backend with access to the host's render node. Aardium.Shared IS the zero-copy

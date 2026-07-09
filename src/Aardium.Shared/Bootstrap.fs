@@ -312,6 +312,12 @@ type AardiumConfig =
         /// Additional window options.
         woptions         : Option<string>
 
+        /// Select the GPU/adapter the browser's GPU process uses, by adapter id.
+        /// Forwarded verbatim to Chromium's vanilla `--use-adapter-luid`
+        /// (Windows/ANGLE-D3D: the DXGI adapter LUID). Match it to the render
+        /// device so zero-copy texture sharing stays on one physical GPU.
+        gpu              : Option<string>
+
         /// Logging callback for Aardium output.
         log              : bool -> string -> unit
     }
@@ -337,6 +343,7 @@ module AardiumConfig =
             hideDock = false
             detectProxy = false
             woptions = None
+            gpu = None
             log = fun _isError _ln -> ()
         }
 
@@ -412,6 +419,10 @@ module AardiumConfig =
 
             match cfg.woptions with
             | Some w -> yield "--woptions=\""  + w.Replace("\"", "\\\"") + "\""
+            | None -> ()
+
+            match cfg.gpu with
+            | Some id -> yield "--gpu-id=" + id
             | None -> ()
         |]
 
@@ -741,6 +752,13 @@ module Aardium =
         [<CustomOperation("detectProxy")>]
         member x.DetectProxy(cfg : AardiumConfig, v : bool) =
             { cfg with detectProxy = v }
+
+        /// Select the GPU/adapter the browser uses, by adapter id (forwarded to
+        /// Chromium's vanilla --use-adapter-luid). Match it to the render device
+        /// so zero-copy texture sharing stays on one physical GPU.
+        [<CustomOperation("gpu")>]
+        member x.Gpu(cfg : AardiumConfig, id : string) =
+            { cfg with gpu = Some id }
 
         /// Logging callback for Aardium output.
         [<CustomOperation("log")>]
