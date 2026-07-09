@@ -28,9 +28,16 @@ jobs:
       - name: Build
         run: dotnet build -c Release src/Aardium.Shared.sln
       - name: Pack
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: dotnet aardpack src/Aardium.Shared.sln --notag
+        # aardpack/paket would greedily pack every paket.template in the tree
+        # (incl. the native ones referencing dist artifacts absent on CI). Pack
+        # ONLY the managed template; take the version from RELEASE_NOTES.
+        run: |
+          set -e
+          VERSION=$(dotnet aardpack --parse-only 2>/dev/null | awk 'NF{last=$0} END{print last}' | tr -d '[:space:]')
+          echo "Packing managed Aardium.Shared $VERSION"
+          mkdir -p bin/pack
+          dotnet paket pack bin/pack --template src/Aardium.Shared/paket.template --version "$VERSION"
+          ls -la bin/pack
       - name: Upload Packages
         uses: actions/upload-artifact@v4
         with:
