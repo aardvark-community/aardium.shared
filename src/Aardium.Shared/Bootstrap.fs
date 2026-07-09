@@ -231,10 +231,20 @@ module private Strings =
         | arch ->
             failf $"Unsupported architecture '{arch}'."
 
+    // Native browser package version — DECOUPLED from the managed lib version so a
+    // platform's native can update on its own cadence. win32/linux carry the GPU
+    // selector (--gpu-id -> use-adapter-luid) in 1.1.0; macOS stays on the original
+    // 1.0.0 binary (it ignores --gpu-id).
+    let nativeVersion =
+        match platform, architecture with
+        | Platform.Win,   "x64" -> "1.1.0"
+        | Platform.Linux, "x64" -> "1.1.0"
+        | _                     -> "1.0.0"
+
     let packageName = $"Aardium.Shared-%s{platform}-%s{architecture}"
 
     let packageUrl =
-        $"https://www.nuget.org/api/v2/package/%s{packageName}/%s{version}"
+        $"https://www.nuget.org/api/v2/package/%s{packageName}/%s{nativeVersion}"
 
     let binaryName =
         match platform with
@@ -246,8 +256,8 @@ module private Strings =
 
     let binaryPaths = [|
         binaryName
-        Path.Combine(architecture, version, binaryName)
-        Path.Combine(architecture, version, "tools", binaryName)
+        Path.Combine(architecture, nativeVersion, binaryName)
+        Path.Combine(architecture, nativeVersion, "tools", binaryName)
     |]
 
     // Use local AppData like Aardvark
@@ -495,7 +505,7 @@ type Aardium =
 
                     // Download nupkg
                     let nupkgPath =
-                        Path.Combine(path, $"%s{Strings.packageName}-%s{Strings.version}.nupkg")
+                        Path.Combine(path, $"%s{Strings.packageName}-%s{Strings.nativeVersion}.nupkg")
 
                     Report.Begin($"Downloading from {Strings.packageUrl}")
                     Report.Progress 0.0
@@ -514,7 +524,7 @@ type Aardium =
                     Report.BeginTimed("Extracting")
 
                     // Extract (for non-Windows we have to extract the contained tar.gz as well)
-                    let finalPath = Path.Combine(path, Strings.architecture, Strings.version)
+                    let finalPath = Path.Combine(path, Strings.architecture, Strings.nativeVersion)
 
                     try
                         Directory.create false finalPath
